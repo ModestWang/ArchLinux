@@ -1,4 +1,78 @@
 # ArchLinux
+
+## archlinuxcn
+```
+使用方法：在 /etc/pacman.conf 文件末尾添加以下两行：
+
+[archlinuxcn]
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
+
+# 安装 haveged
+pacman -Syu haveged
+systemctl start haveged
+systemctl enable haveged
+
+# 初始化 keyring
+rm -fr /etc/pacman.d/gnupg
+pacman-key --init
+pacman-key --populate archlinux
+
+# 之后通过以下命令安装 archlinuxcn-keyring 包导入 GPG key。
+pacman -Sy archlinuxcn-keyring
+# 新系统中安装 archlinuxcn-keyring 包前的额外步骤
+# 2023 年 12 月后，在新系统下安装 archlinuxcn-keyring 时可能会出现错误：
+# error: archlinuxcn-keyring: Signature from "Jiachen YANG (Arch Linux Packager Signing Key) " is marginal trust
+# 需要在本地信任 farseerfc 的 GPG key：
+pacman-key --lsign-key "farseerfc@archlinux.org"
+
+# 执行完毕后再次安装archlinuxcn-keyring
+pacman -S archlinuxcn-keyring
+
+#然后执行下一条命令
+pacman-key --populate archlinuxcn
+```
+
+## environment
+```
+#
+# This file is parsed by pam_env module
+# etc/environment
+# Syntax: simple "KEY=VAL" pairs on separate lines
+#
+
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+XMODIFIERS=@im=fcitx
+SDL_IM_MODULE=fcitx
+GLFW_IM_MODULE=ibus
+```
+
+## flatpak
+```
+sudo apt install flatpak
+
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo # 官方源
+
+flatpak remote-modify flathub --url=https://mirror.sjtu.edu.cn/flathub # 上海交大源
+```
+
+## locale.gen
+/etc/locale.conf
+```
+
+LC_ALL=zh_CN.UTF-8
+```
+
+/etc/locale.gen
+```
+zh_CN.UTF-8 UTF-8  
+en_US.UTF-8 UTF-8
+```
+
+```shell
+locale-gen
+```
+
 ## oh-my-posh
 ```shell
 export PATH="${PATH}:~/bin"
@@ -6,8 +80,10 @@ export POSHTHEME="~/.cache/oh-my-posh/themes"
 
 eval "$(oh-my-posh --init --shell bash --config ${POSHTHEME}/my.omp.json)"
 ```
-```json
+
 my.omp.json
+
+```json
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "blocks": [
@@ -134,3 +210,108 @@ my.omp.json
   "version": 2
 }
 ```
+
+## pacman.conf
+```
+#
+# /etc/pacman.conf
+#
+# See the pacman.conf(5) manpage for option and repository directives
+
+#
+# GENERAL OPTIONS
+#
+[options]
+# The following paths are commented out with their default values listed.
+# If you wish to use different paths, uncomment and update the paths.
+#RootDir     = /
+#DBPath      = /var/lib/pacman/
+#CacheDir    = /var/cache/pacman/pkg/
+#LogFile     = /var/log/pacman.log
+#GPGDir      = /etc/pacman.d/gnupg/
+#HookDir     = /etc/pacman.d/hooks/
+HoldPkg     = pacman glibc
+#XferCommand = /usr/bin/curl -L -C - -f -o %o %u
+#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
+#CleanMethod = KeepInstalled
+Architecture = auto
+
+# Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
+#IgnorePkg   =
+#IgnoreGroup =
+
+#NoUpgrade   =
+#NoExtract   =
+
+# Misc options
+#UseSyslog
+#Color
+#NoProgressBar
+CheckSpace
+#VerbosePkgLists
+#ParallelDownloads = 5
+
+# By default, pacman accepts packages signed by keys that its local keyring
+# trusts (see pacman-key and its man page), as well as unsigned packages.
+SigLevel    = Required DatabaseOptional
+LocalFileSigLevel = Optional
+#RemoteFileSigLevel = Required
+
+# NOTE: You must run `pacman-key --init` before first using pacman; the local
+# keyring can then be populated with the keys of all official Arch Linux
+# packagers with `pacman-key --populate archlinux`.
+
+#
+# REPOSITORIES
+#   - can be defined here or included from another file
+#   - pacman will search repositories in the order defined here
+#   - local/custom mirrors can be added here or in separate files
+#   - repositories listed first will take precedence when packages
+#     have identical names, regardless of version number
+#   - URLs will have $repo replaced by the name of the current repo
+#   - URLs will have $arch replaced by the name of the architecture
+#
+# Repository entries are of the format:
+#       [repo-name]
+#       Server = ServerName
+#       Include = IncludePath
+#
+# The header [repo-name] is crucial - it must be present and
+# uncommented to enable the repo.
+#
+
+# The testing repositories are disabled by default. To enable, uncomment the
+# repo name header and Include lines. You can add preferred servers immediately
+# after the header, and they will be used before the default mirrors.
+
+#[core-testing]
+#Include = /etc/pacman.d/mirrorlist
+
+[core]
+Include = /etc/pacman.d/mirrorlist
+
+#[extra-testing]
+#Include = /etc/pacman.d/mirrorlist
+
+[extra]
+Include = /etc/pacman.d/mirrorlist
+
+# If you want to run 32 bit applications on your x86_64 system,
+# enable the multilib repositories as required here.
+
+#[multilib-testing]
+#Include = /etc/pacman.d/mirrorlist
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+
+# An example of a custom package repository.  See the pacman manpage for
+# tips on creating your own repositories.
+#[custom]
+#SigLevel = Optional TrustAll
+#Server = file:///home/custompkgs
+
+[archlinuxcn]
+Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+```
+
