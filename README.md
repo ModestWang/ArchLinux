@@ -1,10 +1,12 @@
 # ArchLinux
 ## oh-my-posh
+```shell
 export PATH="${PATH}:~/bin"
 export POSHTHEME="~/.cache/oh-my-posh/themes"
 
 eval "$(oh-my-posh --init --shell bash --config ${POSHTHEME}/my.omp.json)"
-
+```
+```json
 my.omp.json
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
@@ -131,3 +133,4 @@ my.omp.json
   "final_space": true,
   "version": 2
 }
+```
