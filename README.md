@@ -47,6 +47,13 @@ SDL_IM_MODULE=fcitx
 GLFW_IM_MODULE=ibus
 ```
 
+## fcitx
+```shell
+sudo pacman -S fcitx5-im fcitx5-chinese-addons fcitx5-material-color fcitx5-configtool
+sudo pacman -S fcitx5-pinyin-zhwiki fcitx5-pinyin-moegirl
+```
+
+
 ## flatpak
 ```
 sudo apt install flatpak
@@ -315,3 +322,5 @@ Include = /etc/pacman.d/mirrorlist
 Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
 ```
 
+## End
+Thanks!🙏
