@@ -217,109 +217,68 @@ my.omp.json
   "version": 2
 }
 ```
-
-## pacman.conf
+## open-vm-tools
 ```
-#
-# /etc/pacman.conf
-#
-# See the pacman.conf(5) manpage for option and repository directives
+Open-VM-Tools
+实用工具
+open-vm-tools 软件包里包括如下工具：
 
-#
-# GENERAL OPTIONS
-#
-[options]
-# The following paths are commented out with their default values listed.
-# If you wish to use different paths, uncomment and update the paths.
-#RootDir     = /
-#DBPath      = /var/lib/pacman/
-#CacheDir    = /var/cache/pacman/pkg/
-#LogFile     = /var/log/pacman.log
-#GPGDir      = /etc/pacman.d/gnupg/
-#HookDir     = /etc/pacman.d/hooks/
-HoldPkg     = pacman glibc
-#XferCommand = /usr/bin/curl -L -C - -f -o %o %u
-#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
-#CleanMethod = KeepInstalled
-Architecture = auto
+vmtoolsd - 负责汇报虚拟机状态的服务。
+vmware-checkvm - 用于检测虚拟机中是否在运行着某程序的工具。
+vmware-toolbox-cmd - 用于收集宿主系统信息的工具。
+vmware-user - Tool to enable clipboard sharing (copy/paste) between host and guest.
+vmware-vmblock-fuse - 文件系统。基于 FUSE (Filesystem in Userspace) 实现了宿主 / 客机之间拖拽文件。
+vmware-xferlogs - 向虚拟机的日志文件输出日志与调试信息。
+vmhgfs-fuse - 挂载 HGFS 共享目录的工具。
+内核模块
+vmhgfs - 旧有的 HGFS 驱动。这是传统的宿主机-客机间共享目录的方案。
+vmxnet - 旧有的 VMXNET 网卡驱动。
+```
 
-# Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
-#IgnorePkg   =
-#IgnoreGroup =
+### 安装
+```shell
+sudo pacman -S open-vm-tools
 
-#NoUpgrade   =
-#NoExtract   =
+#启动服务 
+systemctl start vmtoolsd.service
+systemctl start vmware-vmblock-fuse.service
 
-# Misc options
-#UseSyslog
-#Color
-#NoProgressBar
-CheckSpace
-#VerbosePkgLists
-#ParallelDownloads = 5
+#设置开机启动
+systemctl enable vmtoolsd.service
+systemctl enable vmware-vmblock-fuse.service
 
-# By default, pacman accepts packages signed by keys that its local keyring
-# trusts (see pacman-key and its man page), as well as unsigned packages.
-SigLevel    = Required DatabaseOptional
-LocalFileSigLevel = Optional
-#RemoteFileSigLevel = Required
+#查询服务状态
+systemctl status vmtoolsd.service
+systemctl status vmware-vmblock-fuse.service
 
-# NOTE: You must run `pacman-key --init` before first using pacman; the local
-# keyring can then be populated with the keys of all official Arch Linux
-# packagers with `pacman-key --populate archlinux`.
+#与宿主机同步时间
+vmware-toolbox-cmd timesync enable
 
-#
-# REPOSITORIES
-#   - can be defined here or included from another file
-#   - pacman will search repositories in the order defined here
-#   - local/custom mirrors can be added here or in separate files
-#   - repositories listed first will take precedence when packages
-#     have identical names, regardless of version number
-#   - URLs will have $repo replaced by the name of the current repo
-#   - URLs will have $arch replaced by the name of the architecture
-#
-# Repository entries are of the format:
-#       [repo-name]
-#       Server = ServerName
-#       Include = IncludePath
-#
-# The header [repo-name] is crucial - it must be present and
-# uncommented to enable the repo.
-#
+#窗口分辨率自动适配
+#1.开启3D加速
 
-# The testing repositories are disabled by default. To enable, uncomment the
-# repo name header and Include lines. You can add preferred servers immediately
-# after the header, and they will be used before the default mirrors.
+#2.安装xf86-video-vmware
+pacman -S xf86-video-vmware
 
-#[core-testing]
-#Include = /etc/pacman.d/mirrorlist
+#3.安装gtkmm和gtk2
+pacman -S gtkmm gtk2
 
-[core]
-Include = /etc/pacman.d/mirrorlist
+#4.添加相关模块
+vim /etc/mkinitcpio.conf
+#修改文件
+MODULES=(vsock vmw_vsock_vmci_transport vmw_balloon vmw_vmci vmwgfx)
+#然后执行
+mkinitcpio -p linux
 
-#[extra-testing]
-#Include = /etc/pacman.d/mirrorlist
+#5.重新启动vmtoolsd.service
+systemctl restart vmtoolsd.service
+```
 
-[extra]
-Include = /etc/pacman.d/mirrorlist
-
-# If you want to run 32 bit applications on your x86_64 system,
-# enable the multilib repositories as required here.
-
-#[multilib-testing]
-#Include = /etc/pacman.d/mirrorlist
-
-[multilib]
-Include = /etc/pacman.d/mirrorlist
-
-# An example of a custom package repository.  See the pacman manpage for
-# tips on creating your own repositories.
-#[custom]
-#SigLevel = Optional TrustAll
-#Server = file:///home/custompkgs
-
-[archlinuxcn]
-Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+### 拖拽复制粘贴
+```
+#为了确保拖拽与复制粘贴功能正常工作，需要安装 open-vm-tools 和 gtkmm3 这两个包。
+pacman -S gtkmm3 
+#安装完成，重新启动系统后就可复制了。
 ```
 
 ## End
