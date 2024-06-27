@@ -63,6 +63,9 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 flatpak remote-modify flathub --url=https://mirror.sjtu.edu.cn/flathub # 上海交大源
 ```
 
+## font
+pacman -Syu ttf-jetbrains-mono-nerd noto-fonts-cjk noto-fonts-emoji
+
 ## locale.gen
 /etc/locale.conf
 ```
